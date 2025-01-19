@@ -980,6 +980,444 @@ Gen Java	15
 ソースコードの公開について
 
 
+https://docs.oracle.com/cd/E57425_01/121/SQLRF/statements_10008.htm#i2067715
+
+
+プライマリ・コンテンツに移動
+Oracle® Database SQL言語リファレンス
+12cリリース1 (12.1)
+B71278-13	
+ 	目次へ移動
+目次	索引へ移動
+索引
+前
+前 	次
+次	 
+UPDATE
+用途
+
+UPDATE文を使用すると、表、ビューの実表またはマテリアライズド・ビューのマスター表の既存の値を変更できます。
+
+追加トピック
+
+前提条件
+
+構文
+
+セマンティクス
+
+例
+
+前提条件
+
+表の値を更新する場合は、表が自分のスキーマ内にある必要があります。自分のスキーマ内にない場合は、その表に対するUPDATEオブジェクト権限が必要です。
+
+ビューの実表の値を更新する場合は、次の条件を満たす必要があります。
+
+そのビューに対するUPDATEオブジェクト権限を持っている。
+
+そのビューが含まれているスキーマの所有者が、実表に対するUPDATEオブジェクト権限を持っている。
+
+UPDATE ANY TABLEシステム権限を持っている場合は、任意の表またはビューの実表の値を更新できます。
+
+リモート・データベースのオブジェクトの値を更新するには、オブジェクトのREADまたはSELECTオブジェクト権限も必要です。
+
+SQL92_SECURITY初期化パラメータがTRUEに設定され、UPDATE操作がwhere_clauseの列などの表の列を参照する場合、更新するオブジェクトのSELECTオブジェクト権限も必要です。
+
+構文
+
+update::=
+
+update.gifの説明が続きます。
+図update.gifの説明
+
+(DML_table_expression_clause::=、update_set_clause ::=、where_clause ::=、returning_clause::=、error_logging_clause::=を参照)
+
+DML_table_expression_clause::=
+
+dml_table_expression_clause.gifの説明が続きます。
+図dml_table_expression_clause.gifの説明
+
+(partition_extension_clause::=、subquery::=(「SELECT」の項)、subquery_restriction_clause ::=、table_collection_expression ::=を参照)
+
+partition_extension_clause::=
+
+partition_extension_clause.gifの説明が続きます。
+図partition_extension_clause.gifの説明
+
+subquery_restriction_clause::=
+
+subquery_restriction_clause.gifの説明が続きます。
+図subquery_restriction_clause.gifの説明
+
+table_collection_expression ::=
+
+table_collection_expression.gifの説明が続きます。
+図table_collection_expression.gifの説明
+
+update_set_clause ::=
+
+update_set_clause.gifの説明が続きます。
+図update_set_clause.gifの説明
+
+where_clause::=
+
+where_clause.gifの説明が続きます。
+図where_clause.gifの説明
+
+returning_clause::=
+
+returning_clause.gifの説明が続きます。
+図returning_clause.gifの説明
+
+error_logging_clause::=
+
+error_logging_clause.gifの説明が続きます。
+図error_logging_clause.gifの説明
+
+セマンティクス
+
+hint
+
+文の実行計画を選択する場合に、オプティマイザに指示を与えるためのコメントを指定します。
+
+UPDATEキーワードの直後にパラレル・ヒントを指定した場合、基礎となるスキャンおよびUPDATE操作の両方をパラレル化できます。
+
+
+関連項目:
+
+ヒントの構文および説明については、「ヒント」を参照してください。
+
+パラレル実行の詳細は、『Oracle Database概要』を参照してください。
+
+
+DML_table_expression_clause
+
+ONLY句は、ビューのみに適用されます。UPDATE句のビューが階層に属し、そのどのサブビューの行も変更しない場合は、ONLY構文を指定します。
+
+
+関連項目:
+
+「DML_table_expression_clauseの制限事項:」および「表の更新例:」を参照してください。
+
+schema
+
+更新するオブジェクトが含まれているスキーマを指定します。schemaを指定しない場合、オブジェクトは自分のスキーマ内にあるとみなされます。
+
+table | view | materialized_view | subquery
+
+更新する対象となる、表、ビュー、マテリアライズド・ビュー、または副問合せから戻された列の名前を指定します。表に対してUPDATE文を実行した場合、その表に対応付けられたUPDATEトリガーが起動します。
+
+viewを指定した場合、ビューの実表が更新されます。ビューを定義する問合せに次のいずれかの要素が含まれる場合は、INSTEAD OFトリガーを除き、そのビューを更新することはできません。
+
+集合演算子
+DISTINCT演算子
+集計ファンクションまたは分析ファンクション
+GROUP BY、ORDER BY、MODEL、CONNECT BYまたはSTART WITH句
+SELECT構文のリストにあるコレクション式
+SELECT構文のリストにある副問合せ
+WITH READ ONLYが指定された副問合せ
+再帰WITH句
+結合(一部の例外を除く。詳細は、『Oracle Database管理者ガイド』を参照してください。)
+ビューから、複数の実表は更新できません。
+
+また、WITH CHECK OPTIONを指定してビューを作成した場合、実行結果がビューを定義する問合せの条件を満たす場合にのみ、ビューを更新できます。
+
+tableまたはviewの実表に、1つ以上のドメイン索引列がある場合は、この文によって適切な索引タイプの更新ルーチンが実行されます。
+
+読取り専用のマテリアライズド・ビューの行は更新できません。書込み可能なマテリアライズド・ビューの行を更新すると、基礎となるコンテナ表の行も更新されます。ただし、その更新内容は次のリフレッシュ操作によって上書きされます。マテリアライズド・ビュー・グループ内の更新可能なマテリアライズド・ビューの行を更新すると、マスター表の対応する行も更新されます。
+
+
+関連項目:
+
+索引タイプの更新ルーチンの詳細は、『Oracle Databaseデータ・カートリッジ開発者ガイド』を参照してください。
+
+更新可能なマテリアライズド・ビューについては、「CREATE MATERIALIZED VIEW」を参照してください。
+
+
+partition_extension_clause
+
+更新対象のtable内にあるパーティションまたはサブパーティションの名前またはパーティション・キー値を指定します。パーティション表内の値を更新する場合は、パーティション名を指定する必要はありません。ただし、パーティション名を指定した方が、複雑なwhere_clauseを使用するよりも効果的な場合もあります。
+
+
+関連項目:
+
+「パーティション表と索引の参照」および「パーティションの更新例:」を参照してください。
+
+dblink
+
+オブジェクトが格納されているリモート・データベースへのデータベース・リンクの完全名または部分名を指定します。Oracle Databaseの分散機能を使用している場合にかぎり、データベース・リンクを使用してリモート・オブジェクトを更新できます。
+
+dblinkを省略した場合、オブジェクトがローカル・データベース上にあるとみなされます。
+
+
+関連項目:
+
+データベース・リンクの参照方法の詳細は、「リモート・データベース内のオブジェクトの参照」を参照してください。
+
+subquery_restriction_clause
+
+subquery_restriction_clauseを使用すると、次のいずれかの方法で副問合せを制限できます。
+
+WITH READ ONLY WITH READ ONLYを指定すると、表またはビューを更新禁止にできます。
+
+WITH CHECK OPTION WITH CHECK OPTIONを指定すると、副問合せに含まれない行を生成する表またはビューの変更を禁止できます。この句をDML文の副問合せ内で使用する場合、FROM句内の副問合せには指定できますが、WHERE句内の副問合せには指定できません。
+
+CONSTRAINT constraint CHECK OPTION制約の名前を指定します。この識別子を省略した場合は、Oracleによって自動的にSYS_Cnという形式の制約名が割り当てられます(nはデータベース内で制約名を一意にするための整数)。
+
+
+関連項目:
+
+「WITH CHECK OPTION句の使用例:」
+
+table_collection_expression
+
+table_collection_expressionを使用すると、問合せおよびDML操作で、collection_expression値を表として扱うことができます。collection_expressionには、副問合せ、列、ファンクションまたはコレクション・コンストラクタのいずれかを指定できます。その形式にかかわらず、集合値(ネストした表型またはVARRAY型の値)を戻す必要があります。このようなコレクションの要素抽出プロセスをコレクション・ネスト解除といいます。
+
+TABLEコレクション式を親表と結合する場合は、オプションのプラス(+)には大きな意味があります。+を指定すると、その2つの外部結合が作成され、コレクション式がNULLの場合でも、外部表の行が問合せで戻されるようになります。
+
+
+注意:
+
+以前のリリースのOracleでは、collection_expressionが副問合せの場合、table_collection_expressionをTHE subqueryと表現していました。現在、このような表現方法は非推奨になっています。
+
+table_collection_expressionを使用して、ある表の行を別の表の行を基にして更新できます。たとえば、四半期ごとの売上表を、年度ごとの売上表にまとめることができます。
+
+t_alias
+
+文中で参照する表、ビューまたは副問合せの相関名(別名)を指定します。DML_table_expression_clauseがいずれかのオブジェクト型属性またはオブジェクト型メソッドを参照する場合、この別名が必要です。
+
+
+関連項目:
+
+「相関更新の例:」
+
+DML_table_expression_clauseの制限事項: この句には、次の制限事項があります。
+
+tableまたはviewの実表に、IN_PROGRESSまたはFAILEDとマークされたドメイン索引がある場合は、この文は実行できません。
+
+関係する索引パーティションがUNUSABLEとマークされている場合は、パーティションに挿入できません。
+
+DML_table_expression_clauseの副問合せにはorder_by_clauseを指定できません。
+
+UNUSABLEのマークが付いている索引、索引パーティションまたは索引サブパーティションを指定する場合、SKIP_UNUSABLE_INDEXESセッション・パラメータがTRUEに設定されていないかぎり、UPDATE文は正常に実行されません。
+
+
+関連項目:
+
+SKIP_UNUSABLE_INDEXESセッション・パラメータの詳細は、「ALTER SESSION」を参照してください。
+
+update_set_clause
+
+update_set_clauseを使用すると、列の値を設定できます。
+
+column
+
+更新するオブジェクトの列の名前を指定します。update_set_clauseに表の列を指定しない場合、その列の値は変更されません。
+
+columnがLOBオブジェクト属性を参照している場合、まず空またはNULLの値で初期化する必要があります。リテラルで更新はできません。また、UPDATE以外のSQL文を使用してLOB値を更新する場合は、LOBを含む行を最初にロックしておく必要があります。詳細は、「for_update_clause」を参照してください。
+
+columnが仮想列である場合、ここで指定することはできません。この場合、仮想列の導出元となっている値を更新する必要があります。
+
+columnがパーティション表のパーティション化キーに含まれる場合、別のパーティションまたはサブパーティションに行を移動する列の値を変更すると、行の移動を有効にしないかぎり、UPDATEは正常に実行されません。「CREATE TABLE」の「row_movement_clause」または「ALTER TABLE」を参照してください。
+
+また、columnがリスト・パーティション表のパーティション化キーの一部である場合、パーティションのpartition_key_valueリストに存在していない列の値を指定すると、UPDATEは正常に実行されません。
+
+subquery
+
+更新される行ごとに1行ずつ戻す副問合せを指定します。
+
+update_set_clauseで1列のみを指定した場合、副問合せは1つの値のみを戻します。
+
+update_set_clauseで複数の列を指定した場合、副問合せは指定した列の数の値を戻します。
+
+副問合せが行を戻さなかった場合は、列にはNULLが割り当てられます。
+
+subqueryがリモート・オブジェクトを参照する場合、参照がローカル・データベースのオブジェクトにループバックしないかぎり、UPDATEはパラレルで実行されます。ただし、DML_table_expression_clauseのsubqueryがリモート・オブジェクトを参照する場合は、UPDATEはシリアルで実行されます。
+
+副問合せ内でflashback_query_clauseを使用すると、過去のデータでtableを更新できます。この句の詳細は、「SELECT」の「flashback_query_clause」を参照してください。
+
+
+関連項目:
+
+「SELECT」および「副問合せの使用方法」を参照してください。
+
+「CREATE TABLE」の「parallel_clause」を参照してください。
+
+
+expr
+
+対応する列に割り当てられた新しい値に変換する式を指定します。
+
+
+関連項目:
+
+exprの構文については、第5章「式」および「オブジェクト表の更新例:」を参照してください。
+
+DEFAULT DEFAULTを指定すると、以前に列のデフォルト値として指定した値を列に設定できます。対応する列に対してデフォルト値を指定していない場合、列にNULLが設定されます。
+
+デフォルト値への更新の制限事項: ビューを更新する場合は、DEFAULTを指定できません。
+
+VALUE句
+
+VALUE句を使用すると、オブジェクト表の行全体を指定できます。
+
+VALUE句の制限事項: この句は、オブジェクト表に対してのみ指定できます。
+
+
+注意:
+
+RAW列に文字列リテラルを挿入する場合、後続の問合せ中にRAW列にある索引は使用されずに、全表スキャンが行われます。
+
+
+関連項目:
+
+「オブジェクト表の更新例:」
+
+where_clause
+
+where_clauseを使用すると、指定したconditionがtrueである行のみを更新するように制限できます。この句を指定しない場合、表またはビューのすべての行が更新されます。conditionの構文は、第6章「条件」を参照してください。
+
+where_clauseは、値を更新する行を決定します。where_clauseを指定しない場合、すべての行が更新されます。where_clauseの条件を満たす行ごとに、update_set_clauseの等号演算子(=)の左側にある列に、演算子の対応する右側の式の値が設定されます。式は行が更新される場合に評価されます。
+
+returning_clause
+
+この句を使用すると、DML文に影響される行を取り出すことができます。この句は、表、マテリアライズド・ビュー、および単一の実表を持つビューに指定できます。
+
+returning_clauseを指定したDML文を単一行に実行すると、影響された行、ROWID、および処理された行へのREFを使用している列式が取り出され、ホスト変数またはPL/SQL変数に格納されます。
+
+returning_clauseを指定したDML文を複数行に実行すると、式の値、ROWIDおよび処理された行に関連するREFがバインド配列に格納されます。
+
+expr exprリストの各項目は、適切な構文で表す必要があります。
+
+INTO INTO句を指定すると、変更された行の値を、data_itemリストに指定する変数に格納できます。
+
+data_item data_itemはそれぞれ、取り出したexpr値を格納するためのホスト変数またはPL/SQL変数です。
+
+RETURNINGリストの各式については、INTOリストに、対応する型に互換性があるPL/SQL変数またはホスト変数を指定する必要があります。
+
+制限事項: RETURNING句には、次の制限事項があります。
+
+exprに次の制限事項があります。
+
+UPDATE文およびDELETE文の場合、各exprは、単純式または単一セットの集計ファンクション式である必要があります。1つのreturning_clause内に単純式と単一セットの集計ファンクション式を混在させることはできません。INSERT文の場合、各exprは単純式である必要があります。INSERT文のRETURNING句では、集計ファンクションはサポートされていません。
+
+単一セットの集計ファンクション式をDISTINCTキーワードに含めることはできません。
+
+exprのリストに主キー列または他のNOT NULL列が含まれている場合は、表にBEFORE UPDATEトリガーが定義されていると、UPDATE文の実行に失敗します。
+
+マルチテーブル・インサートではreturning_clauseを指定できません。
+
+パラレルDMLまたはリモート・オブジェクトにはこの句を使用できません。
+
+LONG型を取り出すことはできません。
+
+INSTEAD OFトリガーが定義されたビューに対して指定することはできません。
+
+
+関連項目:
+
+BULK COLLECT句を使用してコレクション変数に複数の値を戻す場合は、『Oracle Database PL/SQL言語リファレンス』を参照してください。
+
+error_logging_clause
+
+error_logging_clauseのUPDATE文での動作は、INSERT文の場合と同じです。詳細は、「INSERT」文の「error_logging_clause」を参照してください。
+
+
+関連項目:
+
+「エラー・ロギングによる表への挿入例:」
+
+例
+
+表の更新例: 次の文は、職種がSH_CLERKのすべての従業員の歩合にNULL値を指定します。
+
+UPDATE employees
+   SET commission_pct = NULL
+   WHERE job_id = 'SH_CLERK';
+次の文は、Douglas Grantを部門20の管理者に昇格させ、給与を$1,000引き上げます。
+
+UPDATE employees SET 
+    job_id = 'SA_MAN', salary = salary + 1000, department_id = 120 
+    WHERE first_name||' '||last_name = 'Douglas Grant'; 
+次の文は、remoteデータベースのemployees表の従業員の給与を増加します。
+
+UPDATE employees@remote
+   SET salary = salary*1.1
+   WHERE last_name = 'Baer';
+次の例は、UPDATE文の次の構文要素を示します。
+
+単一文にまとめたupdate_set_clauseの2つの形式
+
+相関副問合せ
+
+更新された行を制限するwhere_clause
+
+UPDATE employees a 
+    SET department_id = 
+        (SELECT department_id 
+            FROM departments 
+            WHERE location_id = '2100'), 
+        (salary, commission_pct) = 
+        (SELECT 1.1*AVG(salary), 1.5*AVG(commission_pct) 
+          FROM employees b 
+          WHERE a.department_id = b.department_id) 
+    WHERE department_id IN 
+        (SELECT department_id 
+          FROM departments
+          WHERE location_id = 2900 
+              OR location_id = 2700); 
+このUPDATE文によって、次の処理が実行されます。
+
+ジュネーブまたはミュンヘン(location_idは2900または2700)で働く従業員のみを更新します。
+
+これらの従業員のdepartment_idをボンベイ(location_idは2100)の対応するdepartment_idに設定します。
+
+各従業員の給与を、その部門の平均給与の110%に上げます。
+
+各従業員の歩合を、その部門の平均歩合の150%に上げます。
+
+パーティションの更新例: 次の文は、sales表の1つのパーティションの値を更新します。
+
+UPDATE sales PARTITION (sales_q1_1999) s
+   SET s.promo_id = 494
+   WHERE amount_sold > 1000;
+オブジェクト表の更新例: 次の文では、2つのオブジェクト表(people_demo1およびpeople_demo2)が作成されますが、これらの型は「表のコレクション例」で作成されたpeople_typオブジェクトです。この例では、people_demo2から行を選択してpeople_demo1の行を更新する方法を示します。
+
+CREATE TABLE people_demo1 OF people_typ;
+
+CREATE TABLE people_demo2 OF people_typ;
+
+UPDATE people_demo1 p SET VALUE(p) =
+   (SELECT VALUE(q) FROM people_demo2 q
+    WHERE p.department_id = q.department_id)
+   WHERE p.department_id = 10;
+この例では、SET句と副問合せの両方で、VALUEオブジェクト参照ファンクションを使用します。
+
+相関更新の例: 相関副問合せを使用してネストした表の行を更新する例は、「表のコレクション例:」を参照してください。
+
+UPDATE操作中にRETURNING句を使用する例: 次の文は、更新された行の値を戻し、PL/SQL変数bnd1、bnd2、bnd3に結果を格納します。
+
+UPDATE employees
+  SET job_id ='SA_MAN', salary = salary + 1000, department_id = 140
+  WHERE last_name = 'Jones'
+  RETURNING salary*0.25, last_name, department_id
+    INTO :bnd1, :bnd2, :bnd3;
+次の文は、RETURNING句の式で単一セットの集計ファンクションを指定できることを示します。
+
+UPDATE employees
+   SET salary = salary * 1.1
+   WHERE department_id = 100
+   RETURNING SUM(salary) INTO :bnd1;
+ 	前
+前 	次
+次
+Oracleロゴ
+Copyright © 1996, 2017, Oracle and/or its affiliates. All rights reserved. | Cookieの設定 | Ad Choices.	
+ 	目次へ移動
+目次	索引へ移動
+索引
+
 
 
 
