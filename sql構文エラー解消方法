@@ -950,6 +950,36 @@ public interface ServiceResetDao {
 
 
 
+https://sac.genexus.jp/viewtr_saclist.aspx?40168
+
+
+
+ 
+SAC ::	SAC	印刷
+SAC番号	40168
+タイプ名	機能
+SAC登録日	2018/08/21
+SACタイトル	エラー：ORA-00933：Oracle Java Webアプリケーションでグリッドを含むオブジェクトを実行するとSQLコマンドが正しく完了しない
+SAC詳細情報	Oracleを使用し、Java Webアプリケーションでグリッドを使用したオブジェクトを実行すると、次のエラーが発生することがあります。
+
+javax.servlet.ServletException：java.sql.SQLSyntaxErrorException：ORA-00933：SQL command not properly ended
+
+この問題は、Oracleバージョン11で発生し、Oracleデータストアのバージョンのプロパティが「12c or higher」に設定されているために発生します。
+
+GX15よりOracleバージョンのプロパティのデフォルト値が「9.x or higher」から「12c or higher」に変更されたため、GX15で作成されたKBで特に発生する可能性があります。
+グリッドを含んだオブジェクト、WorkWithパターンが適用されたオブジェクト、プロンプトを含んだオブジェクト実行する場合は、上記のエラーが表示されます。
+
+
+SAC回避情報	解決方法は、Oracleバージョンのプロパティを「9.x or higher」に指定することです。
+
+また、GAMを使用する場合には、GAMプラットフォームの2つのバージョンが配布されているため、GeneXus 15U9以上にアップグレードする必要があります。
+SAC番号	SACタイトル
+製品名	報告バージョン名	修正予定バージョン名	リリースバージョン名
+Gen Java	15		
+添付ファイルId	添付ファイル概要	 
+ソースコードの公開について
+
+
 
 
 
